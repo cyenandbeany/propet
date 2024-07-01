@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProPet</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+        }
+        .header, .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1, .footer p {
+            margin: 0;
+        }
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #444;
+        }
+        .nav-tabs button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .nav-tabs button:hover, .nav-tabs button.active {
+            background-color: #555;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px;
+            width: 250px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .product button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .product button:hover {
+            background-color: #218838;
+        }
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+        .cart-icon img {
+            width: 40px;
+            height: auto;
+        }
+        .cart-page {
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+        .cart-page h2 {
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .cart-item span {
+            flex: 1;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .checkout-btn, .admin-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .checkout-btn:hover, .admin-btn:hover {
+            background-color: #0056b3;
+        }
+        .checkout-modal, .admin-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .checkout-content, .admin-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .checkout-form, .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .checkout-form input, .admin-form input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>ProPet</h1>
+</div>
+
+<div class="nav-tabs">
+    <button class="tab-link active" onclick="openTab(event, 'cats')">Cat Toys</button>
+    <button class="tab-link" onclick="openTab(event, 'dogs')">Dog Toys</button>
+    <button class="tab-link" onclick="openTab(event, 'supplies')">Pet Supplies</button>
+</div>
+
+<div id="cats" class="tab-content" style="display: block;">
+    <div class="container" id="cat-toys">
+        <!-- Cat products will be listed here dynamically -->
+    </div>
+</div>
+
+<div id="dogs" class="tab-content">
+    <div class="container" id="dog-toys">
+        <!-- Dog products will be listed here dynamically -->
+    </div>
+</div>
+
+<div id="supplies" class="tab-content">
+    <div class="container" id="pet-supplies">
+        <!-- Pet supplies will be listed here dynamically -->
+    </div>
+</div>
+
+<div class="cart-icon" onclick="openCartPage()">
+    <img src="https://via.placeholder.com/40" alt="Cart">
+</div>
+
+<div id="cartPage" class="cart-page">
+    <h2>Shopping Cart</h2>
+    <div id="cart-items">
+        <!-- Cart items will be added here dynamically -->
+    </div>
+    <p id="total-price">Total: $0</p>
+    <button class="checkout-btn" onclick="openCheckout()">Checkout</button>
+    <button class="admin-btn" onclick="openAdminLogin()">Admin Login</button>
+</div>
+
+<div id="checkoutModal" class="checkout-modal">
+    <div class="checkout-content">
+        <span class="close-btn" onclick="closeCheckout()">&times;</span>
+        <h2>Checkout</h2>
+        <p>Thank you for shopping with us!</p>
+        <p>Your total is: <span id="checkout-total">$0</span></p>
+        <form id="checkout-form" class="checkout-form">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="text" id="address" placeholder="Address" required>
+            <input type="text" id="city" placeholder="City" required>
+            <input type="text" id="state" placeholder="State" required>
+            <input type="text" id="zip" placeholder="Zip Code" required>
+            <input type="text" id="card-number" placeholder="Card Number" required>
+            <input type="text" id="expiration-date" placeholder="Expiration Date (MM/YY)" required>
+            <input type="text" id="cvv" placeholder="CVV" required>
+            <span class="error" id="error-message">Please fill out all fields correctly.</span>
+            <button type="button" class="checkout-btn" onclick="completeCheckout()">Complete Purchase</button>
+        </form>
+    </div>
+</div>
+
+<div id="adminModal" class="admin-modal">
+    <div class="admin-content">
+        <span class="close-btn" onclick="closeAdminLogin()">&times;</span>
+        <h2>Admin Login</h2>
+        <form id="admin-form" class="admin-form">
+            <input type="password" id="admin-password" placeholder="Password" required>
+            <span class="error" id="admin-error-message">Incorrect password.</span>
+            <button type="button" class="admin-btn" onclick="loginAdmin()">Login</button>
+        </form>
+    </div>
+</div>
+
+<div class="footer">
+    <p>&copy; 2024 ProPet E-commerce Shop</p>
+</div>
+
+<script>
+    const catProducts = [
+        { id: 1, name: 'Catnip Toy', price: 5, image: 'https://via.placeholder.com/150' },
+        { id: 2, name: 'Feather Wand', price: 7, image: 'https://via.placeholder.com/150' },
+        { id: 3, name: 'Laser Pointer', price: 10, image: 'https://via.placeholder.com/150' },
+        { id: 4, name: 'Scratching Post', price: 15, image: 'https://via.placeholder.com/150' },
+        { id: 5, name: 'Cat Bed', price: 20, image: 'https://via.placeholder.com/150' },
+    ];
+
+    const dogProducts = [
+        { id: 6, name: 'Chew Toy', price: 5, image: 'https://via.placeholder.com/150' },
+        { id: 7, name: 'Ball', price: 7, image: 'https://via.placeholder.com/150' },
+        { id: 8, name: 'Rope Toy', price: 10, image: 'https://via.placeholder.com/150' },
+        { id: 9, name: 'Frisbee', price: 15, image: 'https://via.placeholder.com/150' },
+        { id: 10, name: 'Dog Bed', price: 20, image: 'https://via.placeholder.com/150' },
+    ];
+
+    const petSupplies = [
+        { id: 11, name: 'Pet Shampoo', price: 8, image: 'https://via.placeholder.com/150' },
+        { id: 12, name: 'Pet Food', price: 25, image: 'https://via.placeholder.com/150' },
+        { id: 13, name: 'Pet Carrier', price: 50, image: 'https://via.placeholder.com/150' },
+        { id: 14, name: 'Pet Bowl', price: 10, image: 'https://via.placeholder.com/150' },
+        { id: 15, name: 'Pet Blanket', price: 15, image: 'https://via.placeholder.com/150' },
+    ];
+
+    const cart = [];
+    const orders = [];
+    const adminPassword = 'admin123';
+
+    function displayProducts(products, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productDiv.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>$${product.price}</p>
+                <button onclick="addToCart(${product.id}, '${containerId}')">Add to Cart</button>
+            `;
+            container.appendChild(productDiv);
+        });
+    }
+
+    function addToCart(productId, containerId) {
+        let product;
+        if (containerId === 'cat-toys') {
+            product = catProducts.find(p => p.id === productId);
+        } else if (containerId === 'dog-toys') {
+            product = dogProducts.find(p => p.id === productId);
+        } else if (containerId === 'pet-supplies') {
+            product = petSupplies.find(p => p.id === productId);
+        }
+        cart.push(product);
+        updateCart();
+    }
+
+    function removeFromCart(productId) {
+        const productIndex = cart.findIndex(item => item.id === productId);
+        if (productIndex !== -1) {
+            cart.splice(productIndex, 1);
+        }
+        updateCart();
+    }
+
+    function updateCart() {
+        const cartItems = document.getElementById('cart-items');
+        cartItems.innerHTML = '';
+        let total = 0;
+        cart.forEach(item => {
+            total += item.price;
+            const cartItem = document.createElement('div');
+            cartItem.classList.add('cart-item');
+            cartItem.innerHTML = `
+                <span>${item.name}</span>
+                <span>$${item.price}</span>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+            `;
+            cartItems.appendChild(cartItem);
+        });
+        document.getElementById('total-price').textContent = `Total: $${total}`;
+        document.getElementById('checkout-total').textContent = `$${total}`;
+    }
+
+    function openCartPage() {
+        document.getElementById('cartPage').style.display = 'block';
+    }
+
+    function openCheckout() {
+        document.getElementById('checkoutModal').style.display = 'flex';
+    }
+
+    function closeCheckout() {
+        document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    function openAdminLogin() {
+        document.getElementById('adminModal').style.display = 'flex';
+    }
+
+    function closeAdminLogin() {
+        document.getElementById('adminModal').style.display = 'none';
+    }
+
+    function validateCheckoutForm() {
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zip = document.getElementById('zip').value;
+        const cardNumber = document.getElementById('card-number').value;
+        const expirationDate = document.getElementById('expiration-date').value;
+        const cvv = document.getElementById('cvv').value;
+        const errorMessage = document.getElementById('error-message');
+
+        if (!name || !address || !city || !state || !zip || !cardNumber || !expirationDate || !cvv) {
+            errorMessage.style.display = 'block';
+            return false;
+        }
+
+        // Basic validation (e.g., length check) can be expanded for real use
+        if (cardNumber.length < 16 || expirationDate.length !== 5 || cvv.length < 3) {
+            errorMessage.style.display = 'block';
+            return false;
+        }
+
+        errorMessage.style.display = 'none';
+        return true;
+    }
+
+    function completeCheckout() {
+        if (validateCheckoutForm()) {
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const zip = document.getElementById('zip').value;
+            const total = document.getElementById('checkout-total').textContent;
+            orders.push({
+                name,
+                address,
+                city,
+                state,
+                zip,
+                total
+            });
+            alert('Purchase complete!');
+            cart.length = 0;
+            updateCart();
+            closeCheckout();
+        }
+    }
+
+    function loginAdmin() {
+        const password = document.getElementById('admin-password').value;
+        const errorMessage = document.getElementById('admin-error-message');
+
+        if (password === adminPassword) {
+            errorMessage.style.display = 'none';
+            openOrdersTab();
+        } else {
+            errorMessage.style.display = 'block';
+        }
+    }
+
+    function openOrdersTab() {
+        const ordersWindow = window.open("", "Orders", "width=600,height=400");
+        ordersWindow.document.write("<h1>Orders</h1><table border='1'><tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Zip</th><th>Total</th></tr>");
+        orders.forEach(order => {
+            ordersWindow.document.write(`<tr><td>${order.name}</td><td>${order.address}</td><td>${order.city}</td><td>${order.state}</td><td>${order.zip}</td><td>${order.total}</td></tr>`);
+        });
+        ordersWindow.document.write("</table>");
+        closeAdminLogin();
+    }
+
+    function openTab(evt, tabName) {
+        const tabContents = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].style.display = 'none';
+        }
+        const tabLinks = document.getElementsByClassName('tab-link');
+        for (let i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(' active', '');
+        }
+        document.getElementById(tabName).style.display = 'block';
+        evt.currentTarget.className += ' active';
+    }
+
+    // Initialize the product display
+    displayProducts(catProducts, 'cat-toys');
+    displayProducts(dogProducts, 'dog-toys');
+    displayProducts(petSupplies, 'pet-supplies');
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
